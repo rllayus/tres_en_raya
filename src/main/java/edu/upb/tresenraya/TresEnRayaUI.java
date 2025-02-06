@@ -5,6 +5,7 @@
 package edu.upb.tresenraya;
 
 import edu.upb.tresenraya.server.ServidorJuego;
+import javax.swing.JLabel;
 
 /**
  *
@@ -20,6 +21,10 @@ public class TresEnRayaUI extends javax.swing.JFrame {
     public TresEnRayaUI() {
         initComponents();
     }
+    
+    public JLabel getLabel(){
+        return this.jlMessage;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -34,6 +39,7 @@ public class TresEnRayaUI extends javax.swing.JFrame {
         btnServer = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
+        jlMessage = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
 
@@ -54,15 +60,23 @@ public class TresEnRayaUI extends javax.swing.JFrame {
 
         jSplitPane1.setDividerLocation(500);
 
+        jlMessage.setText("jLabel1");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 500, Short.MAX_VALUE)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jlMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(250, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 384, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(362, Short.MAX_VALUE)
+                .addComponent(jlMessage)
+                .addContainerGap())
         );
 
         jSplitPane1.setLeftComponent(jPanel1);
@@ -98,7 +112,7 @@ public class TresEnRayaUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (servidorJuego == null) {
             try {
-                servidorJuego = new ServidorJuego();
+                servidorJuego = new ServidorJuego(this);
                 servidorJuego.start();
                 btnServer.setText("Servidor Iniciado");
             } catch (Exception e) {
@@ -149,5 +163,6 @@ public class TresEnRayaUI extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JLabel jlMessage;
     // End of variables declaration//GEN-END:variables
 }

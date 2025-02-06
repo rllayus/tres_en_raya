@@ -4,6 +4,7 @@
  */
 package edu.upb.tresenraya.server;
 
+import edu.upb.tresenraya.TresEnRayaUI;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,9 +16,11 @@ import java.net.Socket;
 public class ServidorJuego extends Thread {
 
     private final ServerSocket serverSocket;
+    private  TresEnRayaUI enRayaUI;
 
-    public ServidorJuego() throws IOException {
+    public ServidorJuego(TresEnRayaUI enRayaUI) throws IOException {
         this.serverSocket = new ServerSocket(1825);
+        this.enRayaUI= enRayaUI;
     }
 
     @Override
@@ -25,7 +28,9 @@ public class ServidorJuego extends Thread {
         while (true) {
             try {
                 Socket socket = this.serverSocket.accept();
-                new SocketClient(socket).start();
+                SocketClient client = new SocketClient(socket, enRayaUI.getLabel());
+                //client.addJLabel(enRayaUI.getLabel());
+                client.start();
             } catch (IOException e) {
                 
             }

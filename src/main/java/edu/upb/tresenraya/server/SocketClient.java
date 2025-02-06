@@ -19,13 +19,20 @@ public class SocketClient extends Thread {
     private final String ip;
     private final DataOutputStream dout;
     private final BufferedReader br;
+    private javax.swing.JLabel jlMessage;
+    
 
 
-    public SocketClient(Socket socket) throws IOException {
+    public SocketClient(Socket socket, javax.swing.JLabel jLabel) throws IOException {
         this.socket = socket;
         this.ip = socket.getInetAddress().getHostAddress();
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
+        this.jlMessage = jLabel;
+    }
+    
+    public void addJLabel(javax.swing.JLabel jLabel){
+        this.jlMessage = jLabel;
     }
 
     @Override
@@ -33,9 +40,9 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-                System.out.println("Mensaje: " + message);
-                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-                send((br.readLine()+System.lineSeparator()).getBytes());
+               if(jlMessage != null){
+                   jlMessage.setText(message);
+               }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -52,7 +59,7 @@ public class SocketClient extends Thread {
     }
 
     public static void main(String[] args) throws IOException {
-        SocketClient socketClient = new SocketClient(new Socket("localhost", 1825));
+        SocketClient socketClient = new SocketClient(new Socket("localhost", 1825), null);
         socketClient.start();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
