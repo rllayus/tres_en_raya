@@ -4,14 +4,16 @@
  */
 package edu.upb.tresenraya;
 
+import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.server.ServidorJuego;
 import javax.swing.JLabel;
+import edu.upb.tresenraya.mediador.OnMessageListener;
 
 /**
  *
  * @author rlaredo
  */
-public class TresEnRayaUI extends javax.swing.JFrame {
+public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener{
 
     private ServidorJuego servidorJuego;
 
@@ -20,6 +22,7 @@ public class TresEnRayaUI extends javax.swing.JFrame {
      */
     public TresEnRayaUI() {
         initComponents();
+        Mediador.addListener(this);
     }
     
     public JLabel getLabel(){
@@ -112,7 +115,7 @@ public class TresEnRayaUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (servidorJuego == null) {
             try {
-                servidorJuego = new ServidorJuego(this);
+                servidorJuego = new ServidorJuego();
                 servidorJuego.start();
                 btnServer.setText("Servidor Iniciado");
             } catch (Exception e) {
@@ -165,4 +168,14 @@ public class TresEnRayaUI extends javax.swing.JFrame {
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JLabel jlMessage;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void onMessage(String msg) {
+        this.jlMessage.setText(msg);
+    }
+
+    @Override
+    public void onClose() {
+        System.out.println("UI: Cayo el cliente");        
+    }
 }

@@ -4,7 +4,7 @@
  */
 package edu.upb.tresenraya.server;
 
-
+import edu.upb.tresenraya.mediador.Mediador;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -15,24 +15,17 @@ import java.net.Socket;
  * @author rlaredo
  */
 public class SocketClient extends Thread {
+
     private final Socket socket;
     private final String ip;
     private final DataOutputStream dout;
     private final BufferedReader br;
-    private javax.swing.JLabel jlMessage;
-    
 
-
-    public SocketClient(Socket socket, javax.swing.JLabel jLabel) throws IOException {
+    public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
         this.ip = socket.getInetAddress().getHostAddress();
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
-        this.jlMessage = jLabel;
-    }
-    
-    public void addJLabel(javax.swing.JLabel jLabel){
-        this.jlMessage = jLabel;
     }
 
     @Override
@@ -40,9 +33,12 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-               if(jlMessage != null){
-                   jlMessage.setText(message);
-               }
+                if (message.equals("cerrar")) {
+                    Mediador.onClose();
+                    return;
+                } else {
+                    Mediador.sendMessage(message);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -59,12 +55,12 @@ public class SocketClient extends Thread {
     }
 
     public static void main(String[] args) throws IOException {
-        SocketClient socketClient = new SocketClient(new Socket("localhost", 1825), null);
+        SocketClient socketClient = new SocketClient(new Socket("localhost", 1825));
         socketClient.start();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         while (true) {
             System.out.println("Escriba un mensaje: ");
-            socketClient.send((br.readLine()+System.lineSeparator()).getBytes());
+            socketClient.send((br.readLine() + System.lineSeparator()).getBytes());
 
         }
     }
