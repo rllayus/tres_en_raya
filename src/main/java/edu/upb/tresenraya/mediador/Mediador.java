@@ -4,6 +4,7 @@
  */
 package edu.upb.tresenraya.mediador;
 
+import edu.upb.tresenraya.TresEnRayaUI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,13 @@ public class Mediador {
     
     public static void sendMessage(String msg){
         for (OnMessageListener onMessageLister : lister) {
-            onMessageLister.onMessage(msg);
+           
+            java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                onMessageLister.onMessage(msg);
+            }
+        });
+            
         }
     }
     public static void onClose(){
