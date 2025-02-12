@@ -4,6 +4,8 @@
  */
 package edu.upb.tresenraya.aula;
 
+import edu.upb.tresenraya.db.ConexionDb;
+
 /**
  *
  * @author Usuario
@@ -17,6 +19,6 @@ public class ClasePrincipal {
        
         Hombre h = new Hombre();
         h.generarTelaAraña();
-       
+       ConexionDb.intance().getConnection();
     }
 }

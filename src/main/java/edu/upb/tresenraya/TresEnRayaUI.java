@@ -4,12 +4,16 @@
  */
 package edu.upb.tresenraya;
 
+import edu.upb.tresenraya.db.ConexionDb;
 import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.server.ServidorJuego;
 import javax.swing.JLabel;
 import edu.upb.tresenraya.mediador.OnMessageListener;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +21,7 @@ import java.util.logging.Logger;
  *
  * @author rlaredo
  */
-public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener, ActionListener{
+public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener, ActionListener, MouseListener{
 
     private ServidorJuego servidorJuego;
 
@@ -27,14 +31,24 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     public TresEnRayaUI() {
         initComponents();
         Mediador.addListener(this);
-        this.btnClase.addActionListener(this);
-        this.btnClase1.addActionListener(this);
-        this.btnClase.setText("<b>Hola</>");
+        ConexionDb.intance().getConnection();
+        GridLayout gridLayout = new GridLayout(3, 3);
+        panelJuego.setLayout(gridLayout);
+        
+        gridLayout.setColumns(3);
+        gridLayout.setRows(3);
+        for (int i = 0; i < gridLayout.getRows(); i++) {
+            for (int j = 0; j < gridLayout.getColumns(); j++) {
+                JLabel label= new JLabel();
+                label.setName(String.format("%s%s", String.valueOf(i), String.valueOf(j)));
+                label.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+                label.addMouseListener(this);
+                panelJuego.add("Label "+i+"-"+j, label);
+            }
+        }
     }
     
-    public JLabel getLabel(){
-        return this.jlMessage;
-    }
+  
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -47,11 +61,9 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
         jToolBar1 = new javax.swing.JToolBar();
         btnServer = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel1 = new javax.swing.JPanel();
-        jlMessage = new javax.swing.JLabel();
-        btnClase = new javax.swing.JButton();
-        btnClase1 = new javax.swing.JButton();
+        panelJuego = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
 
@@ -70,59 +82,14 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         });
         jToolBar1.add(btnServer);
 
-        jSplitPane1.setDividerLocation(500);
+        jLabel1.setText("jLabel1");
+        jLabel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        jToolBar1.add(jLabel1);
 
-        jlMessage.setText("jLabel1");
+        jSplitPane1.setDividerLocation(550);
 
-        btnClase.setText("Boton2");
-        btnClase.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClaseActionPerformed(evt);
-            }
-        });
-
-        btnClase1.setText("Boton1");
-        btnClase1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnClase1ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jlMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(156, 156, 156)
-                        .addComponent(btnClase)))
-                .addContainerGap(250, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(45, 45, 45)
-                    .addComponent(btnClase1)
-                    .addContainerGap(383, Short.MAX_VALUE)))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGap(126, 126, 126)
-                .addComponent(btnClase)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 213, Short.MAX_VALUE)
-                .addComponent(jlMessage)
-                .addContainerGap())
-            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
-                    .addGap(132, 132, 132)
-                    .addComponent(btnClase1)
-                    .addContainerGap(229, Short.MAX_VALUE)))
-        );
-
-        jSplitPane1.setLeftComponent(jPanel1);
+        panelJuego.setLayout(new java.awt.GridLayout(3, 3));
+        jSplitPane1.setLeftComponent(panelJuego);
 
         jList1.setModel(new javax.swing.AbstractListModel<String>() {
             String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
@@ -164,15 +131,6 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         }
     }//GEN-LAST:event_btnServerActionPerformed
 
-    private void btnClaseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClaseActionPerformed
-        // TODO add your handling code here:
-       
-    }//GEN-LAST:event_btnClaseActionPerformed
-
-    private void btnClase1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClase1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_btnClase1ActionPerformed
-
     /**
      * @param args the command line arguments
      */
@@ -209,21 +167,19 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClase;
-    private javax.swing.JButton btnClase1;
     private javax.swing.JButton btnServer;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JList<String> jList1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JLabel jlMessage;
+    private javax.swing.JPanel panelJuego;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void onMessage(String msg) {
         try {
-            this.jlMessage.setText(msg);
+            
             Thread.sleep(40000l);
         } catch (InterruptedException ex) {
             Logger.getLogger(TresEnRayaUI.class.getName()).log(Level.SEVERE, null, ex);
@@ -238,5 +194,27 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     @Override
     public void actionPerformed(ActionEvent e) {
         System.out.println("a: "+e.getActionCommand());
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        JLabel source =(JLabel)e.getSource();
+        System.out.println("" + source.getName());
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
     }
 }
