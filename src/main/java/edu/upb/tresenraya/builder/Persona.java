@@ -38,19 +38,5 @@ public class Persona {
     public String toString() {
         return "Persona ["+ nombre +","+ apellido+"]";
     }
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    public static PersonaBuilder builderV2(){
-        return new PersonaBuilder();
-    }
-    
 }

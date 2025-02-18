@@ -13,6 +13,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <exec.mainClass>edu.upb.tresenraya.TresEnRayaUI</exec.mainClass>
+        <maven.compiler.proc>full</maven.compiler.proc>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
@@ -22,11 +25,12 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
         </dependency>
+        
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
-            <scope>provided</scope>
+            <version>1.18.30</version>
+           
         </dependency>
 
         <dependency>
@@ -34,6 +38,7 @@
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>
         </dependency>
+        
     </dependencies>
 
 
@@ -64,6 +69,26 @@
                     </execution>
                 </executions>
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            
+
         </plugins>
     </build>
 
