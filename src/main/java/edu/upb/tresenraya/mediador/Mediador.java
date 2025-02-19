@@ -34,6 +34,9 @@ public class Mediador {
             
         }
     }
+    
+
+    
     public static void onClose(){
          for (OnMessageListener onMessageLister : lister) {
             onMessageLister.onClose();

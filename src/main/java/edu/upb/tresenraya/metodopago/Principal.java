@@ -18,5 +18,6 @@ public class Principal {
         
         MetodoPago tarjeta = MetodoPago.create("Tarjeta");
         metodoPago.cobrar(new BigDecimal(10));
+        
     }
 }

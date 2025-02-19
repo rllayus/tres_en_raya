@@ -19,7 +19,7 @@ public class MainBuilder {
         
         Estudiante.builder().nombre("AMINA").codigo("1234").build();
         
-        Universidad u = Universidad.builder().nombre("UPB").build();
+        Universidad u = Universidad.builder().build();
         System.out.println(u);
         
     }

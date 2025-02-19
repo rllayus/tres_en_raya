@@ -11,5 +11,4 @@ package edu.upb.tresenraya.mediador;
 public interface OnMessageListener {
     void onMessage(String msg);
     void onClose();
-    
 }

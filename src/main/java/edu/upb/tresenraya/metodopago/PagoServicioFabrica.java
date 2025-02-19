@@ -13,7 +13,6 @@ public class PagoServicioFabrica {
         if(codigo.equals("100")) return new PagoCre();
         
         if(codigo.equals("101")) return new PagoSaguapac();
-        
         return null;
     }
     

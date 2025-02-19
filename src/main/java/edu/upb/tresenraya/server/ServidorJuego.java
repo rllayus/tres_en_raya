@@ -49,6 +49,7 @@ public class ServidorJuego extends Thread implements OnMessageListener{
     public void onClose() {
         System.out.println("Server: Cayo el cliente");
     }
+
     
 
 }

@@ -24,7 +24,7 @@ public abstract class MetodoPago {
         }
         
         if(name.equals("Tarjeta")){
-            return new MetodoPagoQr();
+            return new MetodoPagoTarjeta();
         }
         return null;
     }
