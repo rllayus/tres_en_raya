@@ -4,16 +4,22 @@
  */
 package edu.upb.tresenraya.server;
 
+import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.SolicitudConexion;
 import edu.upb.tresenraya.mediador.Mediador;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import lombok.Getter;
 
 /**
  * @author rlaredo
  */
+@Getter
 public class SocketClient extends Thread {
 
     private final Socket socket;
@@ -24,6 +30,7 @@ public class SocketClient extends Thread {
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
         this.ip = socket.getInetAddress().getHostAddress();
+        System.out.println("IP: "+this.ip);
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
     }
@@ -38,6 +45,15 @@ public class SocketClient extends Thread {
                     return;
                 } else {
                     Mediador.sendMessage(message);
+                }
+                if(message.contains("0001")){
+                    Comando c = new SolicitudConexion();
+                    try {
+                        c.parsear(message);
+                    } catch (Exception ex) {
+                        Logger.getLogger(SocketClient.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    Mediador.sendMessage(c);
                 }
             }
         } catch (IOException e) {
@@ -61,7 +77,6 @@ public class SocketClient extends Thread {
         while (true) {
             System.out.println("Escriba un mensaje: ");
             socketClient.send((br.readLine() + System.lineSeparator()).getBytes());
-
         }
     }
 }

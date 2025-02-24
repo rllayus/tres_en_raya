@@ -4,6 +4,7 @@
  */
 package edu.upb.tresenraya.server;
 
+import edu.upb.tresenraya.bl.MediadorContactos;
 import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.mediador.OnMessageListener;
 import java.io.IOException;
@@ -14,14 +15,14 @@ import java.net.Socket;
  *
  * @author rlaredo
  */
-public class ServidorJuego extends Thread implements OnMessageListener{
+public class ServidorJuego extends Thread {
 
     private final ServerSocket serverSocket;
     
 
     public ServidorJuego() throws IOException {
         this.serverSocket = new ServerSocket(1825);
-        Mediador.addListener(this);
+        
     }
 
     @Override
@@ -30,7 +31,7 @@ public class ServidorJuego extends Thread implements OnMessageListener{
             try {
                 Socket socket = this.serverSocket.accept();
                 SocketClient client = new SocketClient(socket);
-                //client.addJLabel(enRayaUI.getLabel());
+                MediadorContactos.geInstance().newClient(client);
                 client.start();
             } catch (IOException e) {
                 
@@ -39,17 +40,4 @@ public class ServidorJuego extends Thread implements OnMessageListener{
         }
 
     }
-
-    @Override
-    public void onMessage(String msg) {
-        System.out.println(msg);
-    }
-
-    @Override
-    public void onClose() {
-        System.out.println("Server: Cayo el cliente");
-    }
-
-    
-
 }

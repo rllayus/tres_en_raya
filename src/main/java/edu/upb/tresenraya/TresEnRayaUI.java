@@ -4,25 +4,27 @@
  */
 package edu.upb.tresenraya;
 
+import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.db.ConexionDb;
 import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.server.ServidorJuego;
 import javax.swing.JLabel;
 import edu.upb.tresenraya.mediador.OnMessageListener;
-import edu.upb.tresenraya.metodopago.MetodoPago;
+import edu.upb.tresenraya.server.SocketClient;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.net.Socket;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author rlaredo
  */
-public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener, ActionListener, MouseListener{
+public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener, ActionListener, MouseListener {
 
     private ServidorJuego servidorJuego;
 
@@ -35,21 +37,19 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         ConexionDb.intance().getConnection();
         GridLayout gridLayout = new GridLayout(3, 3);
         panelJuego.setLayout(gridLayout);
-        
+
         gridLayout.setColumns(3);
         gridLayout.setRows(3);
         for (int i = 0; i < gridLayout.getRows(); i++) {
             for (int j = 0; j < gridLayout.getColumns(); j++) {
-                JLabel label= new JLabel();
+                JLabel label = new JLabel();
                 label.setName(String.format("%s%s", String.valueOf(i), String.valueOf(j)));
                 label.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
                 label.addMouseListener(this);
-                panelJuego.add("Label "+i+"-"+j, label);
+                panelJuego.add("Label " + i + "-" + j, label);
             }
         }
     }
-    
-  
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -62,13 +62,11 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
         jToolBar1 = new javax.swing.JToolBar();
         btnServer = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         panelJuego = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        jBtnAgregar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -85,32 +83,6 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         });
         jToolBar1.add(btnServer);
 
-        jLabel1.setText("jLabel1");
-        jLabel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
-        jToolBar1.add(jLabel1);
-
-        jButton1.setText("QR");
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton1);
-
-        jButton2.setText("Tarjeta");
-        jButton2.setFocusable(false);
-        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        jToolBar1.add(jButton2);
-
         jSplitPane1.setDividerLocation(550);
 
         panelJuego.setLayout(new java.awt.GridLayout(3, 3));
@@ -125,17 +97,32 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
         jSplitPane1.setRightComponent(jScrollPane1);
 
+        jBtnAgregar.setText("Agregar");
+        jBtnAgregar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jBtnAgregar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jBtnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jBtnAgregarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 552, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jBtnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBtnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSplitPane1))
         );
@@ -156,15 +143,23 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         }
     }//GEN-LAST:event_btnServerActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jBtnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAgregarActionPerformed
         // TODO add your handling code here:
-        MetodoPago metodoPago = MetodoPago.create("QR");
-    }//GEN-LAST:event_jButton1ActionPerformed
+        String ip = JOptionPane.showInputDialog("Ingresa la IP del cliente");
+        if (ip != null) {
+            String nombre = "Ricardo Laredo";
+            try {
+                SocketClient client = new SocketClient(new Socket(ip, 1825));
+                client.start();
+                Contactos.getInstance().onNewClient(client);
+                Contactos.getInstance().send(ip, "0001|" + nombre + System.lineSeparator());
+                JOptionPane.showMessageDialog(null, "Conexion exitoso", "Info", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "Error al conectar con el cliente", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-        MetodoPago metodoPago = MetodoPago.create("Tarjeta");
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jBtnAgregarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -203,9 +198,7 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnServer;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
+    private javax.swing.JButton jBtnAgregar;
     private javax.swing.JList<String> jList1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
@@ -215,27 +208,22 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
     @Override
     public void onMessage(String msg) {
-        try {
-            
-            Thread.sleep(40000l);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TresEnRayaUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        System.out.println(msg);
     }
 
     @Override
     public void onClose() {
-        System.out.println("UI: Cayo el cliente");        
+        System.out.println("UI: Cayo el cliente");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("a: "+e.getActionCommand());
+        System.out.println("a: " + e.getActionCommand());
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        JLabel source =(JLabel)e.getSource();
+        JLabel source = (JLabel) e.getSource();
         System.out.println("" + source.getName());
     }
 
@@ -253,6 +241,11 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
     @Override
     public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void onMessage(Comando c) {
+        
     }
 
 }
