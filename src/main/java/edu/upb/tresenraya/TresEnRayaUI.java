@@ -6,6 +6,7 @@ package edu.upb.tresenraya;
 
 import edu.upb.tresenraya.bl.Comando;
 import edu.upb.tresenraya.bl.Contactos;
+import edu.upb.tresenraya.bl.SolicitudConexion;
 import edu.upb.tresenraya.db.ConexionDb;
 import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.server.ServidorJuego;
@@ -245,7 +246,28 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
     @Override
     public void onMessage(Comando c) {
-        
+        if (c.getCodigoComando().equals("0001")) {
+            SolicitudConexion sol = (SolicitudConexion) c;
+            String nombre = sol.getNombre();
+
+            int n = JOptionPane.showConfirmDialog( this, nombre +" te ha solicitado",
+                    "Aceptas?",
+                    JOptionPane.YES_NO_OPTION);
+            if (n == JOptionPane.YES_OPTION) {
+               Contactos.getInstance().send(c.getIP, Acae);
+            } else if (n == JOptionPane.NO_OPTION) {
+Contactos.getInstance().send(c.getIP, Acae);
+            } else {
+
+            }
+        }
+        if (c instanceof SolicitudConexion) {
+
+        }
+        if (c.getClass().equals(SolicitudConexion.class)) {
+
+        }
+
     }
 
 }

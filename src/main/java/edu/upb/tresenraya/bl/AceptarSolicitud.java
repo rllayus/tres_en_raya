@@ -6,42 +6,37 @@ package edu.upb.tresenraya.bl;
 
 import edu.upb.tresenraya.exception.CommandoIncorrectoException;
 import java.util.regex.Pattern;
-import lombok.Getter;
 
 /**
  *
  * @author Usuario
  */
-@Getter
-public class SolicitudConexion extends Comando{
-    private String nombre;
+public class AceptarSolicitud extends Comando{
     
-    public SolicitudConexion(String nombre){
+    public AceptarSolicitud(){
         super();
-        super.setCodigoComando("0001");
-        this.nombre = nombre;
+        super.setCodigoComando("0003");
     }
     
-    public SolicitudConexion(){}
-
+   
     @Override
     public void parsear(String mensaje)throws Exception{
         String [] s = mensaje.split(Pattern.quote("|"));
-        if(s.length != 2){
+        if(s.length != 1){
             throw new CommandoIncorrectoException("Comando inválido");
         }
         super.setCodigoComando(s[0]);
-        this.nombre = s[1];
+     
     }
 
     @Override
     public String getComando() {
-        return super.getCodigoComando()+ "|" + this.nombre + System.lineSeparator();
+        return super.getCodigoComando()+ "|" + System.lineSeparator();
     }
 
     @Override
     public String toString() {
-        return super.getCodigoComando()+ "|" + this.nombre + System.lineSeparator();
+        return super.getCodigoComando()+ "|" +  System.lineSeparator();
     }
     
     

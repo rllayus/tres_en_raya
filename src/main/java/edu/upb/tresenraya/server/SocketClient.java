@@ -5,7 +5,9 @@
 package edu.upb.tresenraya.server;
 
 import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.RechazarSolicitud;
 import edu.upb.tresenraya.bl.SolicitudConexion;
+import edu.upb.tresenraya.exception.CommandoIncorrectoException;
 import edu.upb.tresenraya.mediador.Mediador;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -30,7 +32,7 @@ public class SocketClient extends Thread {
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
         this.ip = socket.getInetAddress().getHostAddress();
-        System.out.println("IP: "+this.ip);
+        System.out.println("IP: " + this.ip);
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
     }
@@ -46,14 +48,26 @@ public class SocketClient extends Thread {
                 } else {
                     Mediador.sendMessage(message);
                 }
-                if(message.contains("0001")){
-                    Comando c = new SolicitudConexion();
-                    try {
+                try {
+                    Comando c = null;
+                    if (message.contains("0001")) {
+                        c = new SolicitudConexion();
                         c.parsear(message);
-                    } catch (Exception ex) {
-                        Logger.getLogger(SocketClient.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                    if (message.contains("0002")) {
+                        c = new RechazarSolicitud();
+                        c.parsear(message);
+                    }
+                     if (message.contains("0003")) {
+                        c = new RechazarSolicitud();
+                        c.parsear(message);
+                    }
+                    
                     Mediador.sendMessage(c);
+                } catch (CommandoIncorrectoException e) {
+                    System.out.println("Error en la intepretacion del comando: " + message);
+                } catch (Exception ex) {
+                    Logger.getLogger(SocketClient.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } catch (IOException e) {
