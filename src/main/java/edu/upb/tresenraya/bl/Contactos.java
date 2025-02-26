@@ -12,32 +12,35 @@ import java.util.Map;
  *
  * @author Usuario
  */
-public class Contactos implements SocketListener{
+public class Contactos implements SocketListener {
+
     private final Map<String, SocketClient> contatos = new HashMap<>();
-    private static Contactos instance = new Contactos();
+    private static final Contactos instance = new Contactos();
+
+
     private Contactos() {
-        MediadorContactos.geInstance().addListener(this);
+        System.out.println("Construyendo Contacto");
+       MediadorContactos.geInstance().addListener(this);
     }
-    
-    public static Contactos getInstance(){
+
+    public static Contactos getInstance() {
         return instance;
     }
-    
+
     @Override
     public void onNewClient(SocketClient sc) {
         synchronized (contatos) {
             contatos.put(sc.getIp(), sc);
         }
+        System.out.println("Cantidad de contactos: " + contatos.size());
     }
-    
-    public  void send(String ip, String msg){
+
+    public void send(String ip, String msg) {
+        System.out.println("Enviando: " + msg);
         SocketClient sc = this.contatos.get(ip);
-        if(sc != null){
+        if (sc != null) {
             sc.send(msg.getBytes());
         }
     }
-    
-   
-    
-    
+
 }

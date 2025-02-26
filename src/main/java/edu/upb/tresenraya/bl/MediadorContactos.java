@@ -23,15 +23,15 @@ public class MediadorContactos {
     }
     
     public void addListener(SocketListener sl){
-        synchronized (lister) {
-            lister.add(sl);
-        }
+        lister.add(sl);
     }
     
      public  void newClient(SocketClient msg){
+         System.out.println("Nnuevo cliente");
         for (SocketListener listener : lister) {
             java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
+                System.out.println("Evento nuevo cliente");
                 listener.onNewClient(msg);
             }
         });

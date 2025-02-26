@@ -4,6 +4,7 @@
  */
 package edu.upb.tresenraya.server;
 
+import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.bl.MediadorContactos;
 import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.mediador.OnMessageListener;
@@ -22,7 +23,7 @@ public class ServidorJuego extends Thread {
 
     public ServidorJuego() throws IOException {
         this.serverSocket = new ServerSocket(1825);
-        
+        Contactos.getInstance();
     }
 
     @Override

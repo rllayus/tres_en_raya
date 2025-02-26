@@ -4,8 +4,13 @@
  */
 package edu.upb.tresenraya.server;
 
+import edu.upb.tresenraya.bl.AceptarSolicitudJuego;
 import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.IniciarJuego;
+import edu.upb.tresenraya.bl.MarcarPartida;
+import edu.upb.tresenraya.bl.NuevaPartida;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
+import edu.upb.tresenraya.bl.RechazarSolicitudJuego;
 import edu.upb.tresenraya.bl.SolicitudConexion;
 import edu.upb.tresenraya.exception.CommandoIncorrectoException;
 import edu.upb.tresenraya.mediador.Mediador;
@@ -32,7 +37,6 @@ public class SocketClient extends Thread {
     public SocketClient(Socket socket) throws IOException {
         this.socket = socket;
         this.ip = socket.getInetAddress().getHostAddress();
-        System.out.println("IP: " + this.ip);
         dout = new DataOutputStream(socket.getOutputStream());
         br = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
     }
@@ -42,12 +46,7 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-                if (message.equals("cerrar")) {
-                    Mediador.onClose();
-                    return;
-                } else {
-                    Mediador.sendMessage(message);
-                }
+                System.out.println("Comando: "+message);
                 try {
                     Comando c = null;
                     if (message.contains("0001")) {
@@ -58,12 +57,36 @@ public class SocketClient extends Thread {
                         c = new RechazarSolicitud();
                         c.parsear(message);
                     }
-                     if (message.contains("0003")) {
+                    if (message.contains("0003")) {
                         c = new RechazarSolicitud();
                         c.parsear(message);
                     }
+                    if (message.contains("0004")) {
+                        c = new IniciarJuego();
+                        c.parsear(message);
+                    }
+                    if (message.contains("0005")) {
+                        c = new RechazarSolicitudJuego();
+                        c.parsear(message);
+                    }
+                    if (message.contains("0006")) {
+                        c = new AceptarSolicitudJuego();
+                        c.parsear(message);
+                    }
+                    if (message.contains("0007")) {
+                        c = new NuevaPartida();
+                        c.parsear(message);
+                    }
                     
-                    Mediador.sendMessage(c);
+                    if (message.contains("0008")) {
+                        c = new MarcarPartida();
+                        c.parsear(message);
+                    }
+                    
+                    if (c != null) {
+                        c.setIp(ip);
+                        Mediador.sendMessage(c);
+                    }
                 } catch (CommandoIncorrectoException e) {
                     System.out.println("Error en la intepretacion del comando: " + message);
                 } catch (Exception ex) {

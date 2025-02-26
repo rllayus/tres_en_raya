@@ -11,31 +11,37 @@ import java.util.regex.Pattern;
  *
  * @author Usuario
  */
-public class AceptarSolicitud extends Comando {
+public class IniciarJuego extends Comando {
+    private String simbolo;
 
-    public AceptarSolicitud() {
+    public IniciarJuego() {
         super();
-        super.setCodigoComando("0003");
+        super.setCodigoComando("0004");
+    }
+    public IniciarJuego(String simbolo){
+        super.setCodigoComando("0004");
+        this.simbolo = simbolo;
     }
 
     @Override
     public void parsear(String mensaje) throws Exception {
         String[] s = mensaje.split(Pattern.quote("|"));
-        if (s.length != 1) {
+        if (s.length != 2) {
             throw new CommandoIncorrectoException("Comando inválido");
         }
         super.setCodigoComando(s[0]);
+        simbolo = s[1];
 
     }
 
     @Override
     public String getComando() {
-        return super.getCodigoComando() + System.lineSeparator();
+        return super.getCodigoComando() + "|"+ simbolo+ System.lineSeparator();
     }
 
     @Override
     public String toString() {
-        return super.getCodigoComando() + System.lineSeparator();
+        return super.getCodigoComando() + "|"+ simbolo+ System.lineSeparator();
     }
 
 }

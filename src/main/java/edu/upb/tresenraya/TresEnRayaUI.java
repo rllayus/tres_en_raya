@@ -4,8 +4,11 @@
  */
 package edu.upb.tresenraya;
 
+import edu.upb.tresenraya.bl.AceptarSolicitud;
 import edu.upb.tresenraya.bl.Comando;
 import edu.upb.tresenraya.bl.Contactos;
+import edu.upb.tresenraya.bl.MarcarPartida;
+import edu.upb.tresenraya.bl.RechazarSolicitud;
 import edu.upb.tresenraya.bl.SolicitudConexion;
 import edu.upb.tresenraya.db.ConexionDb;
 import edu.upb.tresenraya.mediador.Mediador;
@@ -19,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.Socket;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 
 /**
@@ -28,6 +32,8 @@ import javax.swing.JOptionPane;
 public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener, ActionListener, MouseListener {
 
     private ServidorJuego servidorJuego;
+    private SocketClient client;
+    private String jugadorBIP;
 
     /**
      * Creates new form TresEnRayaUI
@@ -44,12 +50,13 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         for (int i = 0; i < gridLayout.getRows(); i++) {
             for (int j = 0; j < gridLayout.getColumns(); j++) {
                 JLabel label = new JLabel();
-                label.setName(String.format("%s%s", String.valueOf(i), String.valueOf(j)));
+                label.setName(String.format("%s|%s", String.valueOf(i), String.valueOf(j)));
                 label.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
                 label.addMouseListener(this);
                 panelJuego.add("Label " + i + "-" + j, label);
             }
         }
+        initServer();
     }
 
     /**
@@ -150,7 +157,7 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         if (ip != null) {
             String nombre = "Ricardo Laredo";
             try {
-                SocketClient client = new SocketClient(new Socket(ip, 1825));
+                client = new SocketClient(new Socket(ip, 1825));
                 client.start();
                 Contactos.getInstance().onNewClient(client);
                 Contactos.getInstance().send(ip, "0001|" + nombre + System.lineSeparator());
@@ -207,6 +214,18 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     private javax.swing.JPanel panelJuego;
     // End of variables declaration//GEN-END:variables
 
+    private void initServer() {
+        if (servidorJuego == null) {
+            try {
+                servidorJuego = new ServidorJuego();
+                servidorJuego.start();
+                btnServer.setText("Servidor Iniciado");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void onMessage(String msg) {
         System.out.println(msg);
@@ -225,7 +244,11 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     @Override
     public void mouseClicked(MouseEvent e) {
         JLabel source = (JLabel) e.getSource();
-        System.out.println("" + source.getName());
+        source.setText("X");
+        System.out.println(source.getName());
+        String s[] = source.getName().split(Pattern.quote("|"));
+        MarcarPartida marcar = new MarcarPartida("X", Integer.parseInt(s[0]), Integer.parseInt(s[1]));
+        Contactos.getInstance().send(jugadorBIP, marcar.getComando());
     }
 
     @Override
@@ -248,17 +271,19 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     public void onMessage(Comando c) {
         if (c.getCodigoComando().equals("0001")) {
             SolicitudConexion sol = (SolicitudConexion) c;
+            this.jugadorBIP = sol.getIp();
             String nombre = sol.getNombre();
 
-            int n = JOptionPane.showConfirmDialog( this, nombre +" te ha solicitado",
+            int n = JOptionPane.showConfirmDialog(this, nombre + " te ha solicitado",
                     "Aceptas?",
                     JOptionPane.YES_NO_OPTION);
-            if (n == JOptionPane.YES_OPTION) {
-               Contactos.getInstance().send(c.getIP, Acae);
-            } else if (n == JOptionPane.NO_OPTION) {
-Contactos.getInstance().send(c.getIP, Acae);
-            } else {
-
+            switch (n) {
+                case JOptionPane.YES_OPTION ->
+                    Contactos.getInstance().send(c.getIp(), new AceptarSolicitud().getComando());
+                case JOptionPane.NO_OPTION ->
+                    Contactos.getInstance().send(c.getIp(), new RechazarSolicitud().getComando());
+                default -> {
+                }
             }
         }
         if (c instanceof SolicitudConexion) {

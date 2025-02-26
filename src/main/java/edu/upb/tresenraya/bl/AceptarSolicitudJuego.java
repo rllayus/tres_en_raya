@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
  *
  * @author Usuario
  */
-public class AceptarSolicitud extends Comando {
+public class AceptarSolicitudJuego extends Comando {
 
-    public AceptarSolicitud() {
+    public AceptarSolicitudJuego() {
         super();
-        super.setCodigoComando("0003");
+        super.setCodigoComando("0006");
     }
 
     @Override
