@@ -13,6 +13,8 @@ import edu.upb.tresenraya.bl.MarcarPartida;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
 import edu.upb.tresenraya.bl.RechazarSolicitudJuego;
 import edu.upb.tresenraya.bl.SolicitudConexion;
+import edu.upb.tresenraya.bl.juego.JuegoTresEnRaya;
+import edu.upb.tresenraya.bl.juego.SimboloType;
 import edu.upb.tresenraya.db.ConexionDb;
 import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.server.ServidorJuego;
@@ -35,10 +37,11 @@ import javax.swing.JOptionPane;
 public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener, ActionListener, MouseListener {
 
     private ServidorJuego servidorJuego;
+    private JuegoTresEnRaya juego;
     private SocketClient client;
     private String jugadorBIP;
-    GridLayout gridLayout;
-    JLabel [][] tablero;
+    private GridLayout gridLayout;
+    private JLabel[][] tableroUI;
 
     /**
      * Creates new form TresEnRayaUI
@@ -47,23 +50,39 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         initComponents();
         Mediador.addListener(this);
         ConexionDb.intance().getConnection();
-        gridLayout = new GridLayout(3, 3);
-        tablero = new JLabel[3][3];
-        panelJuego.setLayout(gridLayout);
 
-        gridLayout.setColumns(3);
-        gridLayout.setRows(3);
+        init();
+    }
+
+    private void init() {
+        gridLayout = new GridLayout(3, 3);
+        panelJuego.setLayout(gridLayout);
+        tableroUI = new JLabel[3][3];
+        juego = new JuegoTresEnRaya();
         for (int i = 0; i < gridLayout.getRows(); i++) {
             for (int j = 0; j < gridLayout.getColumns(); j++) {
-                JLabel label = new JLabel();
-                tablero[i][j]= label;
+                JLabel label = new JLabel();             
                 label.setName(String.format("%s|%s", String.valueOf(i), String.valueOf(j)));
                 label.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
                 label.addMouseListener(this);
+                tableroUI[i][j]= label;
                 panelJuego.add("Label " + i + "-" + j, label);
             }
         }
-     
+
+        mostrar();
+    }
+
+    private void mostrar() {
+        if (juego != null) {
+            SimboloType [][] tablero = juego.getTablero();
+            for (int i = 0; i < gridLayout.getRows(); i++) {
+                for (int j = 0; j < gridLayout.getColumns(); j++) {
+                    JLabel label = tableroUI[i][j];
+                    label.setText(tablero[i][j].name());
+                }
+            }
+        }
     }
 
     /**
