@@ -13,29 +13,42 @@ import java.util.List;
  * @author Usuario
  */
 public class MediadorContactos {
+
     private final List<SocketListener> lister = new ArrayList<>();
     private static MediadorContactos instance = new MediadorContactos();
-    private MediadorContactos(){
+
+    private MediadorContactos() {
     }
-    
-    public static MediadorContactos  geInstance(){
-        return instance;   
+
+    public static MediadorContactos geInstance() {
+        return instance;
     }
-    
-    public void addListener(SocketListener sl){
+
+    public void addListener(SocketListener sl) {
         lister.add(sl);
     }
-    
-     public  void newClient(SocketClient msg){
-         System.out.println("Nnuevo cliente");
+
+    public void removeCliente(SocketClient sl) {
         for (SocketListener listener : lister) {
             java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                System.out.println("Evento nuevo cliente");
-                listener.onNewClient(msg);
-            }
-        });
-        
+                public void run() {
+                    System.out.println("Evento nuevo cliente");
+                    listener.removeClient(sl);
+                }
+            });
+        }
+    }
+
+    public void newClient(SocketClient msg) {
+        System.out.println("Nnuevo cliente");
+        for (SocketListener listener : lister) {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    System.out.println("Evento nuevo cliente");
+                    listener.onNewClient(msg);
+                }
+            });
+
         }
     }
 }

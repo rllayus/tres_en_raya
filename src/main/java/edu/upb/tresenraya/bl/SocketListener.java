@@ -12,5 +12,6 @@ import edu.upb.tresenraya.server.SocketClient;
  */
 public interface SocketListener {
     void onNewClient(SocketClient sc);
+    void removeClient(SocketClient sc);
     
 }

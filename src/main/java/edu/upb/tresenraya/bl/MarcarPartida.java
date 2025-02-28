@@ -6,11 +6,15 @@ package edu.upb.tresenraya.bl;
 
 import edu.upb.tresenraya.exception.CommandoIncorrectoException;
 import java.util.regex.Pattern;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author Usuario
  */
+@Getter
+@Setter
 public class MarcarPartida extends Comando {
 
     private String simbolo;

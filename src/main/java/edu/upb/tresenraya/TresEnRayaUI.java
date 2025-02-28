@@ -5,10 +5,13 @@
 package edu.upb.tresenraya;
 
 import edu.upb.tresenraya.bl.AceptarSolicitud;
+import edu.upb.tresenraya.bl.AceptarSolicitudJuego;
 import edu.upb.tresenraya.bl.Comando;
 import edu.upb.tresenraya.bl.Contactos;
+import edu.upb.tresenraya.bl.IniciarJuego;
 import edu.upb.tresenraya.bl.MarcarPartida;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
+import edu.upb.tresenraya.bl.RechazarSolicitudJuego;
 import edu.upb.tresenraya.bl.SolicitudConexion;
 import edu.upb.tresenraya.db.ConexionDb;
 import edu.upb.tresenraya.mediador.Mediador;
@@ -34,6 +37,8 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     private ServidorJuego servidorJuego;
     private SocketClient client;
     private String jugadorBIP;
+    GridLayout gridLayout;
+    JLabel [][] tablero;
 
     /**
      * Creates new form TresEnRayaUI
@@ -42,7 +47,8 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         initComponents();
         Mediador.addListener(this);
         ConexionDb.intance().getConnection();
-        GridLayout gridLayout = new GridLayout(3, 3);
+        gridLayout = new GridLayout(3, 3);
+        tablero = new JLabel[3][3];
         panelJuego.setLayout(gridLayout);
 
         gridLayout.setColumns(3);
@@ -50,13 +56,14 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         for (int i = 0; i < gridLayout.getRows(); i++) {
             for (int j = 0; j < gridLayout.getColumns(); j++) {
                 JLabel label = new JLabel();
+                tablero[i][j]= label;
                 label.setName(String.format("%s|%s", String.valueOf(i), String.valueOf(j)));
                 label.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
                 label.addMouseListener(this);
                 panelJuego.add("Label " + i + "-" + j, label);
             }
         }
-        initServer();
+     
     }
 
     /**
@@ -273,25 +280,53 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
             SolicitudConexion sol = (SolicitudConexion) c;
             this.jugadorBIP = sol.getIp();
             String nombre = sol.getNombre();
-
             int n = JOptionPane.showConfirmDialog(this, nombre + " te ha solicitado",
                     "Aceptas?",
                     JOptionPane.YES_NO_OPTION);
             switch (n) {
                 case JOptionPane.YES_OPTION ->
-                    Contactos.getInstance().send(c.getIp(), new AceptarSolicitud().getComando());
+                    Contactos.getInstance().send(c.getIp(), new AceptarSolicitud("Ricardo Laredo").getComando());
                 case JOptionPane.NO_OPTION ->
                     Contactos.getInstance().send(c.getIp(), new RechazarSolicitud().getComando());
                 default -> {
                 }
             }
+            return;
         }
-        if (c instanceof SolicitudConexion) {
-
+        
+        if (c.getCodigoComando().equals("0004")) {
+            IniciarJuego sol = (IniciarJuego) c;
+            this.jugadorBIP = sol.getIp();
+           
+            int n = JOptionPane.showConfirmDialog(this,  " Te ha solicitado iniciar Juego",
+                    "Aceptas?",
+                    JOptionPane.YES_NO_OPTION);
+            switch (n) {
+                case JOptionPane.YES_OPTION ->
+                    Contactos.getInstance().send(c.getIp(), new AceptarSolicitudJuego().getComando());
+                case JOptionPane.NO_OPTION ->
+                    Contactos.getInstance().send(c.getIp(), new RechazarSolicitudJuego().getComando());
+                default -> {
+                }
+            }
+            return;
         }
-        if (c.getClass().equals(SolicitudConexion.class)) {
-
+        if (c.getCodigoComando().equals("0008")) {
+            MarcarPartida sol = (MarcarPartida) c;
+            tablero[sol.getPosicionX()][sol.getPosicionY()].setText(sol.getSimbolo());
+            return;
         }
+        
+        if (c.getCodigoComando().equals("0003")) {
+            IniciarJuego inciarJuego = new IniciarJuego("X");
+            Contactos.getInstance().send(c.getIp(), inciarJuego.getComando());
+            return;
+        }
+        
+        if (c.getCodigoComando().equals("0002")) {
+            jugadorBIP = null;
+        }
+       
 
     }
 

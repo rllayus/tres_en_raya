@@ -5,8 +5,11 @@
 package edu.upb.tresenraya.bl;
 
 import edu.upb.tresenraya.server.SocketClient;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  *
@@ -14,8 +17,10 @@ import java.util.Map;
  */
 public class Contactos implements SocketListener {
 
-    private final Map<String, SocketClient> contatos = new HashMap<>();
+    private final ConcurrentMap<String, SocketClient> contatos = new ConcurrentHashMap<>();
     private static final Contactos instance = new Contactos();
+    private BigDecimal pagar;
+    private String cuenta;
 
 
     private Contactos() {
@@ -28,10 +33,12 @@ public class Contactos implements SocketListener {
     }
 
     @Override
+    public  void removeClient(SocketClient sc){
+       contatos.remove(sc.getIp());
+    }
+    @Override
     public void onNewClient(SocketClient sc) {
-        synchronized (contatos) {
-            contatos.put(sc.getIp(), sc);
-        }
+        contatos.put(sc.getIp(), sc);
         System.out.println("Cantidad de contactos: " + contatos.size());
     }
 

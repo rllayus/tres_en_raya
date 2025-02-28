@@ -4,10 +4,13 @@
  */
 package edu.upb.tresenraya.server;
 
+import edu.upb.tresenraya.bl.AceptarSolicitud;
 import edu.upb.tresenraya.bl.AceptarSolicitudJuego;
 import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.bl.IniciarJuego;
 import edu.upb.tresenraya.bl.MarcarPartida;
+import edu.upb.tresenraya.bl.MediadorContactos;
 import edu.upb.tresenraya.bl.NuevaPartida;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
 import edu.upb.tresenraya.bl.RechazarSolicitudJuego;
@@ -58,7 +61,7 @@ public class SocketClient extends Thread {
                         c.parsear(message);
                     }
                     if (message.contains("0003")) {
-                        c = new RechazarSolicitud();
+                        c = new AceptarSolicitud();
                         c.parsear(message);
                     }
                     if (message.contains("0004")) {
@@ -94,7 +97,7 @@ public class SocketClient extends Thread {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            MediadorContactos.geInstance().removeCliente(this);
         }
     }
 
@@ -107,13 +110,4 @@ public class SocketClient extends Thread {
         }
     }
 
-    public static void main(String[] args) throws IOException {
-        SocketClient socketClient = new SocketClient(new Socket("localhost", 1825));
-        socketClient.start();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        while (true) {
-            System.out.println("Escriba un mensaje: ");
-            socketClient.send((br.readLine() + System.lineSeparator()).getBytes());
-        }
-    }
 }
