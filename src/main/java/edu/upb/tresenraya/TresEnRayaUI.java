@@ -332,7 +332,7 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         }
         if (c.getCodigoComando().equals("0008")) {
             MarcarPartida sol = (MarcarPartida) c;
-            tablero[sol.getPosicionX()][sol.getPosicionY()].setText(sol.getSimbolo());
+            tableroUI[sol.getPosicionX()][sol.getPosicionY()].setText(sol.getSimbolo());
             return;
         }
         
