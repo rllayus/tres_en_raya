@@ -14,6 +14,7 @@ public class JuegoTresEnRaya {
 
     public JuegoTresEnRaya() {
         iniciar();
+        this.turno = SimboloType.O;
     }
 
     public void iniciar() {
@@ -111,7 +112,6 @@ public class JuegoTresEnRaya {
 
     
     private SimboloType coincidenciaDiagonal() {
-
         SimboloType simbolo;
         boolean coincidencia = true;
         //Diagonal principal

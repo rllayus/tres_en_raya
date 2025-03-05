@@ -22,6 +22,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import lombok.Getter;
@@ -49,7 +50,7 @@ public class SocketClient extends Thread {
         try {
             String message;
             while ((message = br.readLine()) != null) {
-                System.out.println("Comando: "+message);
+                System.out.println("Comando: " + message);
                 try {
                     Comando c = null;
                     if (message.contains("0001")) {
@@ -80,12 +81,12 @@ public class SocketClient extends Thread {
                         c = new NuevaPartida();
                         c.parsear(message);
                     }
-                    
+
                     if (message.contains("0008")) {
                         c = new MarcarPartida();
                         c.parsear(message);
                     }
-                    
+
                     if (c != null) {
                         c.setIp(ip);
                         Mediador.sendMessage(c);
@@ -110,4 +111,13 @@ public class SocketClient extends Thread {
         }
     }
 
+
+    public synchronized void send(String msg) {
+        try {
+            dout.write(msg.getBytes(Charset.forName("UTF-8")));
+            dout.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
