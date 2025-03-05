@@ -6,6 +6,7 @@ package edu.upb.tresenraya;
 
 import edu.upb.tresenraya.bl.AceptarSolicitud;
 import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.Contacto;
 import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.bl.MarcarPartida;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
@@ -18,14 +19,19 @@ import edu.upb.tresenraya.server.ServidorJuego;
 import javax.swing.JLabel;
 import edu.upb.tresenraya.mediador.OnMessageListener;
 import edu.upb.tresenraya.server.SocketClient;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.net.Socket;
 import java.util.regex.Pattern;
+import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -39,6 +45,8 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     private String jugadorBIP;
     private GridLayout gridLayout;
     private JLabel[][] tableroUI;
+    private DefaultListModel<Contacto> contacModel = new DefaultListModel<>();
+    
 
     /**
      * Creates new form TresEnRayaUI
@@ -48,33 +56,37 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         Mediador.addListener(this);
         ConexionDb.intance().getConnection();
         init();
+        jLContactos.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    jLContactos.setSelectedIndex(jLContactos.locationToIndex(e.getPoint()));
+                    menuListaContactos.show(jLContactos, e.getPoint().x, e.getPoint().y);
+                }
+            }
+        });
+        jLContactos.setCellRenderer(new ContactRenderer());
+        jLContactos.setModel(contacModel);
     }
 
     private void init() {
-        gridLayout = new GridLayout(3, 3);
-        panelJuego.setLayout(gridLayout);
-        tableroUI = new JLabel[3][3];
-        juego = new JuegoTresEnRaya();
-        for (int i = 0; i < gridLayout.getRows(); i++) {
-            for (int j = 0; j < gridLayout.getColumns(); j++) {
-                JLabel label = new JLabel();
-                label.setName(String.format("%s|%s", String.valueOf(i), String.valueOf(j)));
-                label.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
-                label.addMouseListener(this);
-                tableroUI[i][j]= label;
-                panelJuego.add("Label " + i + "-" + j, label);
-            }
-        }
         mostrar();
     }
 
     private void mostrar() {
         if (juego != null) {
-            SimboloType [][] tablero = juego.getTablero();
+            SimboloType[][] tablero = juego.getTablero();
             for (int i = 0; i < gridLayout.getRows(); i++) {
                 for (int j = 0; j < gridLayout.getColumns(); j++) {
                     JLabel label = tableroUI[i][j];
-                    label.setText(tablero[i][j].name());
+
+                    if (tablero[i][j].equals(SimboloType.O)) {
+                        label.setText(tablero[i][j].name());
+                        label.setForeground(Color.GREEN);
+                    }
+                    if (tablero[i][j].equals(SimboloType.X)) {
+                        label.setText(tablero[i][j].name());
+                        label.setForeground(Color.RED);
+                    }
                 }
             }
         }
@@ -89,13 +101,23 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        menuListaContactos = new javax.swing.JPopupMenu();
+        jMenuItemRetar = new javax.swing.JMenuItem();
         jToolBar1 = new javax.swing.JToolBar();
         btnServer = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
-        panelJuego = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
+        jLContactos = new javax.swing.JList<>();
+        jPanelJuego1 = new edu.upb.tresenraya.JPanelJuego();
         jBtnAgregar = new javax.swing.JButton();
+
+        jMenuItemRetar.setText("Retar");
+        jMenuItemRetar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemRetarActionPerformed(evt);
+            }
+        });
+        menuListaContactos.add(jMenuItemRetar);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -112,19 +134,26 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         });
         jToolBar1.add(btnServer);
 
-        jSplitPane1.setDividerLocation(550);
+        jSplitPane1.setBorder(javax.swing.BorderFactory.createEtchedBorder(javax.swing.border.EtchedBorder.RAISED, java.awt.Color.blue, new java.awt.Color(204, 204, 204)));
+        jSplitPane1.setDividerLocation(600);
+        jSplitPane1.setResizeWeight(0.5);
 
-        panelJuego.setLayout(new java.awt.GridLayout(3, 3));
-        jSplitPane1.setLeftComponent(panelJuego);
-
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane1.setViewportView(jList1);
+        jScrollPane1.setViewportView(jLContactos);
 
         jSplitPane1.setRightComponent(jScrollPane1);
+
+        javax.swing.GroupLayout jPanelJuego1Layout = new javax.swing.GroupLayout(jPanelJuego1);
+        jPanelJuego1.setLayout(jPanelJuego1Layout);
+        jPanelJuego1Layout.setHorizontalGroup(
+            jPanelJuego1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 598, Short.MAX_VALUE)
+        );
+        jPanelJuego1Layout.setVerticalGroup(
+            jPanelJuego1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 554, Short.MAX_VALUE)
+        );
+
+        jSplitPane1.setLeftComponent(jPanelJuego1);
 
         jBtnAgregar.setText("Agregar");
         jBtnAgregar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -139,11 +168,11 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 670, Short.MAX_VALUE)
+            .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 763, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 552, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jBtnAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jBtnAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -190,6 +219,17 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
     }//GEN-LAST:event_jBtnAgregarActionPerformed
 
+    private void jMenuItemRetarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRetarActionPerformed
+        // TODO add your handling code here:
+        JPanelJuego jPanelJuego = new JPanelJuego();
+        jPanelJuego.setVisible(true);
+        JFrame ventanaSecundaria = new JFrame("Ventana Secundaria");
+        ventanaSecundaria.getContentPane().add(jPanelJuego);
+        ventanaSecundaria.setSize(400, 400); // Establece el tamaño de la ventana
+        ventanaSecundaria.setLocationRelativeTo(null); // Centra la ventana en la pantalla
+        ventanaSecundaria.setVisible(true);
+    }//GEN-LAST:event_jMenuItemRetarActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -228,11 +268,13 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnServer;
     private javax.swing.JButton jBtnAgregar;
-    private javax.swing.JList<String> jList1;
+    private javax.swing.JList<Contacto> jLContactos;
+    private javax.swing.JMenuItem jMenuItemRetar;
+    private edu.upb.tresenraya.JPanelJuego jPanelJuego1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JPanel panelJuego;
+    private javax.swing.JPopupMenu menuListaContactos;
     // End of variables declaration//GEN-END:variables
 
     private void initServer() {
@@ -268,8 +310,13 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         source.setText("X");
         System.out.println(source.getName());
         String s[] = source.getName().split(Pattern.quote("|"));
-        MarcarPartida marcar = new MarcarPartida("X", Integer.parseInt(s[0]), Integer.parseInt(s[1]));
-        Contactos.getInstance().send(jugadorBIP, marcar.getComando());
+        if (this.juego != null) {
+            SimboloType simbolo = this.juego.marcar(SimboloType.O, Integer.parseInt(s[0]), Integer.parseInt(s[1]));
+            MarcarPartida marcar = new MarcarPartida("X", Integer.parseInt(s[0]), Integer.parseInt(s[1]));
+            Contactos.getInstance().send(jugadorBIP, marcar.getComando());
+            if (simbolo.equals(SimboloType.O) || simbolo.equals(SimboloType.X)) {
+            }
+        }
     }
 
     @Override
