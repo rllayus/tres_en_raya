@@ -4,8 +4,12 @@
  */
 package edu.upb.tresenraya;
 
+import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.MarcarPartida;
 import edu.upb.tresenraya.bl.juego.JuegoTresEnRaya;
 import edu.upb.tresenraya.bl.juego.SimboloType;
+import edu.upb.tresenraya.mediador.Mediador;
+import edu.upb.tresenraya.mediador.OnMessageListener;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -18,7 +22,7 @@ import java.awt.event.MouseListener;
  *
  * @author rlaredo
  */
-public class JPanelJuego extends javax.swing.JPanel implements MouseListener {
+public class JPanelJuego extends javax.swing.JPanel implements MouseListener , OnMessageListener{
 
     private final JuegoTresEnRaya juego;
     private final int alturaTurno = 50;
@@ -30,6 +34,7 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener {
         initComponents();
         this.juego = new JuegoTresEnRaya();
         this.addMouseListener(this);
+        Mediador.addListener(this);
     }
 
     /**
@@ -136,7 +141,6 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        SimboloType[][] tablero = this.juego.getTablero();
         int x = e.getX();
         int y = e.getY() - alturaTurno; // Ajuste de coordenada Y
 
@@ -145,6 +149,7 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener {
             int columna = x / (getWidth() / 3);
 
             this.juego.marcar(juego.mostrarTurno(), fila, columna);
+            //Contactos.getInstance().send(TOOL_TIP_TEXT_KEY, TOOL_TIP_TEXT_KEY);
             verificarGanador();
             verificarEmpate();
             repaint();
@@ -165,6 +170,31 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
+    }
+
+    @Override
+    public void onMessage(String msg) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void onMessage(Comando c) {
+        if (c.getCodigoComando().equals("0008")) {
+            MarcarPartida sol = (MarcarPartida) c;
+            SimboloType simbolo=SimboloType.valueOf(sol.getSimbolo());
+            this.juego.marcar(simbolo, sol.getPosicionX(), sol.getPosicionY());
+            verificarGanador();
+            verificarEmpate();
+            repaint();
+            return;
+           
+        }
+       
+    }
+
+    @Override
+    public void onClose() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
