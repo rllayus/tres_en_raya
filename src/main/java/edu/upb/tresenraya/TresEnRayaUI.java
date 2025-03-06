@@ -10,7 +10,6 @@ import edu.upb.tresenraya.bl.Comando;
 import edu.upb.tresenraya.bl.Contacto;
 import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.bl.IniciarJuego;
-import edu.upb.tresenraya.bl.MarcarPartida;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
 import edu.upb.tresenraya.bl.RechazarSolicitudJuego;
 import edu.upb.tresenraya.bl.SolicitudConexion;
@@ -21,7 +20,6 @@ import edu.upb.tresenraya.server.ServidorJuego;
 import javax.swing.JLabel;
 import edu.upb.tresenraya.mediador.OnMessageListener;
 import edu.upb.tresenraya.server.SocketClient;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -42,7 +40,6 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
     private JuegoTresEnRaya juego;
     private SocketClient client;
     private String jugadorBIP;
-   
     private JLabel[][] tableroUI;
     private DefaultListModel<Contacto> contacModel = new DefaultListModel<>();
     
@@ -54,7 +51,6 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         initComponents();
         Mediador.addListener(this);
         ConexionDb.intance().getConnection();
-        
 
         jLContactos.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {

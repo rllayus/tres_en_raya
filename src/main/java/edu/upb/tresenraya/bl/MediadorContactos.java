@@ -5,8 +5,7 @@
 package edu.upb.tresenraya.bl;
 
 import edu.upb.tresenraya.server.SocketClient;
-import java.util.ArrayList;
-import java.util.List;
+import edu.upb.tresenraya.utils.MyCollection;
 
 /**
  *
@@ -14,7 +13,7 @@ import java.util.List;
  */
 public class MediadorContactos {
 
-    private final List<SocketListener> lister = new ArrayList<>();
+    private final MyCollection<SocketListener> lister = new MyCollection<>();
     private static MediadorContactos instance = new MediadorContactos();
 
     private MediadorContactos() {
@@ -29,26 +28,27 @@ public class MediadorContactos {
     }
 
     public void removeCliente(SocketClient sl) {
-        for (SocketListener listener : lister) {
+        while (lister.hasNext()) {
+            SocketListener listener = lister.getNext();
             java.awt.EventQueue.invokeLater(new Runnable() {
                 public void run() {
-                    System.out.println("Evento nuevo cliente");
                     listener.removeClient(sl);
                 }
             });
+            
         }
+
     }
 
     public void newClient(SocketClient msg) {
-        System.out.println("Nnuevo cliente");
-        for (SocketListener listener : lister) {
+        while (lister.hasNext()) {
+            SocketListener listener = lister.getNext();
             java.awt.EventQueue.invokeLater(new Runnable() {
                 public void run() {
-                    System.out.println("Evento nuevo cliente");
                     listener.onNewClient(msg);
                 }
             });
-
+            
         }
     }
 }
