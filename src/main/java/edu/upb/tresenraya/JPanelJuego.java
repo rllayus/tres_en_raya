@@ -5,6 +5,7 @@
 package edu.upb.tresenraya;
 
 import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.bl.MarcarPartida;
 import edu.upb.tresenraya.bl.juego.JuegoTresEnRaya;
 import edu.upb.tresenraya.bl.juego.SimboloType;
@@ -17,15 +18,20 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author rlaredo
  */
+@Getter
+@Setter
 public class JPanelJuego extends javax.swing.JPanel implements MouseListener , OnMessageListener{
-
-    private final JuegoTresEnRaya juego;
+    private JuegoTresEnRaya juego;
     private final int alturaTurno = 50;
+    private String ipJugadorRemoto = null;
+   
 
     /**
      * Creates new form JPanelJuego
@@ -123,8 +129,11 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener , O
     }
 
     private void dibujarTurno(Graphics g) {
-
         String texto = "Turno: " + this.juego.mostrarTurno().name();
+        if(ipJugadorRemoto == null){
+            texto = "Juego sin iniciar"  ;
+        }
+
         g.setColor(Color.LIGHT_GRAY);
         g.fillRect(0, 0, getWidth(), alturaTurno);
 
@@ -147,9 +156,10 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener , O
         if (y >= 0) { // Verificar si el clic está dentro del tablero principal
             int fila = y / ((getHeight() - alturaTurno) / 3);
             int columna = x / (getWidth() / 3);
-
-            this.juego.marcar(juego.mostrarTurno(), fila, columna);
-            //Contactos.getInstance().send(TOOL_TIP_TEXT_KEY, TOOL_TIP_TEXT_KEY);
+            SimboloType simboloType = juego.mostrarTurno();
+            this.juego.marcar(simboloType, fila, columna);
+            Comando comando = new MarcarPartida(simboloType.name(), fila, columna);
+            Contactos.getInstance().send(ipJugadorRemoto, comando.getComando());
             verificarGanador();
             verificarEmpate();
             repaint();
@@ -196,5 +206,16 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener , O
     public void onClose() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-
+    
+    public void iniciarJuego(String ipJugadorRemoto, SimboloType simboloType){
+        this.ipJugadorRemoto = ipJugadorRemoto;
+        this.juego = new JuegoTresEnRaya(simboloType);
+        repaint();
+        System.out.println("Iniciando juego");
+    }
+    public void finalizar(){
+        this.ipJugadorRemoto = null;
+        this.juego = new JuegoTresEnRaya();
+        repaint();
+    }
 }

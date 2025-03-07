@@ -13,11 +13,10 @@ import edu.upb.tresenraya.bl.IniciarJuego;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
 import edu.upb.tresenraya.bl.RechazarSolicitudJuego;
 import edu.upb.tresenraya.bl.SolicitudConexion;
-import edu.upb.tresenraya.bl.juego.JuegoTresEnRaya;
+import edu.upb.tresenraya.bl.juego.SimboloType;
 import edu.upb.tresenraya.db.ConexionDb;
 import edu.upb.tresenraya.mediador.Mediador;
 import edu.upb.tresenraya.server.ServidorJuego;
-import javax.swing.JLabel;
 import edu.upb.tresenraya.mediador.OnMessageListener;
 import edu.upb.tresenraya.server.SocketClient;
 import java.awt.event.ActionEvent;
@@ -37,11 +36,9 @@ import javax.swing.SwingUtilities;
 public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListener, ActionListener {
 
     private ServidorJuego servidorJuego;
-    private JuegoTresEnRaya juego;
     private SocketClient client;
     private String jugadorBIP;
-    private JLabel[][] tableroUI;
-    private DefaultListModel<Contacto> contacModel = new DefaultListModel<>();
+    private final DefaultListModel<Contacto> contacModel = new DefaultListModel<>();
     
 
     /**
@@ -52,16 +49,16 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         Mediador.addListener(this);
         ConexionDb.intance().getConnection();
 
-        jLContactos.addMouseListener(new MouseAdapter() {
+        jListContactos.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
-                    jLContactos.setSelectedIndex(jLContactos.locationToIndex(e.getPoint()));
-                    menuListaContactos.show(jLContactos, e.getPoint().x, e.getPoint().y);
+                    jListContactos.setSelectedIndex(jListContactos.locationToIndex(e.getPoint()));
+                    menuListaContactos.show(jListContactos, e.getPoint().x, e.getPoint().y);
                 }
             }
         });
-        jLContactos.setCellRenderer(new ContactRenderer());
-        jLContactos.setModel(contacModel);
+        jListContactos.setCellRenderer(new ContactRenderer());
+        jListContactos.setModel(contacModel);
     }
 
  
@@ -78,14 +75,15 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
         menuListaContactos = new javax.swing.JPopupMenu();
         jMenuItemRetar = new javax.swing.JMenuItem();
+        cerrar = new javax.swing.JMenuItem();
         jToolBar1 = new javax.swing.JToolBar();
         btnServer = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jSplitPane1 = new javax.swing.JSplitPane();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jLContactos = new javax.swing.JList<>();
-        jPanelJuego1 = new edu.upb.tresenraya.JPanelJuego();
+        jListContactos = new javax.swing.JList<>();
+        jPanelJuego = new edu.upb.tresenraya.JPanelJuego();
         jBtnAgregar = new javax.swing.JButton();
 
         jMenuItemRetar.setText("Retar");
@@ -95,6 +93,9 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
             }
         });
         menuListaContactos.add(jMenuItemRetar);
+
+        cerrar.setText("jMenuItem1");
+        menuListaContactos.add(cerrar);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -121,22 +122,22 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
         jSplitPane1.setDividerLocation(600);
         jSplitPane1.setResizeWeight(0.5);
 
-        jScrollPane1.setViewportView(jLContactos);
+        jScrollPane1.setViewportView(jListContactos);
 
         jSplitPane1.setRightComponent(jScrollPane1);
 
-        javax.swing.GroupLayout jPanelJuego1Layout = new javax.swing.GroupLayout(jPanelJuego1);
-        jPanelJuego1.setLayout(jPanelJuego1Layout);
-        jPanelJuego1Layout.setHorizontalGroup(
-            jPanelJuego1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelJuegoLayout = new javax.swing.GroupLayout(jPanelJuego);
+        jPanelJuego.setLayout(jPanelJuegoLayout);
+        jPanelJuegoLayout.setHorizontalGroup(
+            jPanelJuegoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 598, Short.MAX_VALUE)
         );
-        jPanelJuego1Layout.setVerticalGroup(
-            jPanelJuego1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanelJuegoLayout.setVerticalGroup(
+            jPanelJuegoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 554, Short.MAX_VALUE)
         );
 
-        jSplitPane1.setLeftComponent(jPanelJuego1);
+        jSplitPane1.setLeftComponent(jPanelJuego);
 
         jBtnAgregar.setText("Agregar");
         jBtnAgregar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -193,7 +194,7 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
                 client = new SocketClient(new Socket(ip, 1825));
                 client.start();
                 Contactos.getInstance().onNewClient(client);
-                Contactos.getInstance().send(ip, "0001|" + nombre + System.lineSeparator());
+                Contactos.getInstance().send(client.getIp(), "0001|" + nombre + System.lineSeparator());
                 JOptionPane.showMessageDialog(null, "Conexion exitoso", "Info", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Error al conectar con el cliente", "Error", JOptionPane.ERROR_MESSAGE);
@@ -250,12 +251,13 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnServer;
+    private javax.swing.JMenuItem cerrar;
     private javax.swing.JButton jBtnAgregar;
-    private javax.swing.JList<Contacto> jLContactos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JList<Contacto> jListContactos;
     private javax.swing.JMenuItem jMenuItemRetar;
-    private edu.upb.tresenraya.JPanelJuego jPanelJuego1;
+    private edu.upb.tresenraya.JPanelJuego jPanelJuego;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JToolBar jToolBar1;
@@ -309,10 +311,14 @@ public class TresEnRayaUI extends javax.swing.JFrame implements OnMessageListene
                     "Aceptas?",
                     JOptionPane.YES_NO_OPTION);
             switch (n) {
-                case JOptionPane.YES_OPTION ->
+                case JOptionPane.YES_OPTION ->{
                     Contactos.getInstance().send(c.getIp(), new AceptarSolicitudJuego().getComando());
-                case JOptionPane.NO_OPTION ->
+                    jPanelJuego.iniciarJuego(sol.getIp(), SimboloType.valueOf(sol.getSimbolo()));
+                }
+                case JOptionPane.NO_OPTION ->{
                     Contactos.getInstance().send(c.getIp(), new RechazarSolicitudJuego().getComando());
+                    jPanelJuego.finalizar();
+                }
                 default -> {
                 }
             }

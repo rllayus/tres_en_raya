@@ -6,11 +6,13 @@ package edu.upb.tresenraya.bl;
 
 import edu.upb.tresenraya.exception.CommandoIncorrectoException;
 import java.util.regex.Pattern;
+import lombok.Getter;
 
 /**
  *
  * @author Usuario
  */
+@Getter
 public class IniciarJuego extends Comando {
     private String simbolo;
 

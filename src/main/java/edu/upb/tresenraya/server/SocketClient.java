@@ -111,6 +111,17 @@ public class SocketClient extends Thread {
         }
     }
 
+    public void detener() {
+        if (this.socket != null) {
+            try {
+                this.socket.close();
+                this.br.close();
+                this.dout.close();
+            } catch (IOException e) {
+
+            }
+        }
+    }
 
     public synchronized void send(String msg) {
         try {

@@ -9,9 +9,10 @@ import java.util.ArrayList;
 /**
  *
  * @author rlaredo
+ * @param <T>
  */
 public class MyCollection<T> implements Iterator<T>{
-    private ArrayList<T> list = new ArrayList<>();
+    private final ArrayList<T> list = new ArrayList<>();
     private int index = 0;
     
     public void add(T contact){
@@ -28,7 +29,7 @@ public class MyCollection<T> implements Iterator<T>{
         if(!hasNext())
             return null;
         T obj = list.get(index);
-        index++;
+        index=index +1;
         return obj;
     }   
 }

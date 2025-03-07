@@ -9,12 +9,18 @@ package edu.upb.tresenraya.bl.juego;
  * @author rlaredo
  */
 public class JuegoTresEnRaya {
+
     private SimboloType turno;
     private SimboloType[][] tablero;
 
     public JuegoTresEnRaya() {
         iniciar();
         this.turno = SimboloType.O;
+    }
+
+    public JuegoTresEnRaya(SimboloType simboloType) {
+        iniciar();
+        this.turno = simboloType;
     }
 
     public void iniciar() {
@@ -25,13 +31,13 @@ public class JuegoTresEnRaya {
             }
         }
     }
-    
-    public SimboloType[][] getTablero(){
+
+    public SimboloType[][] getTablero() {
         return tablero;
     }
 
     public SimboloType marcar(SimboloType simbolo, int posicionX, int posicionY) {
-        if(!turno.equals(simbolo)){
+        if (!turno.equals(simbolo)) {
             System.out.println("No es turno del jugador");
             return SimboloType.EMPTY;
         }
@@ -49,14 +55,14 @@ public class JuegoTresEnRaya {
             return SimboloType.EMPTY;
         }
         tablero[posicionX][posicionY] = simbolo;
-        turno = turno == SimboloType.O? SimboloType.X: SimboloType.O;
-        if(finPartida()){
+        turno = turno == SimboloType.O ? SimboloType.X : SimboloType.O;
+        if (finPartida()) {
             return mostrarGanador();
         }
         return SimboloType.EMPTY;
     }
-    
-    public SimboloType mostrarTurno(){
+
+    public SimboloType mostrarTurno() {
         return turno;
     }
 
@@ -110,7 +116,6 @@ public class JuegoTresEnRaya {
         return SimboloType.EMPTY;
     }
 
-    
     private SimboloType coincidenciaDiagonal() {
         SimboloType simbolo;
         boolean coincidencia = true;
@@ -160,24 +165,22 @@ public class JuegoTresEnRaya {
         return true;
     }
 
-
-
-public SimboloType mostrarGanador() {
+    public SimboloType mostrarGanador() {
         SimboloType simbolo = coincidenciaLinea();
-        if (simbolo != SimboloType.EMPTY) {   
+        if (simbolo != SimboloType.EMPTY) {
             return simbolo;
         }
         simbolo = coincidenciaColumna();
 
         if (simbolo != SimboloType.EMPTY) {
-          
+
             return simbolo;
         }
         simbolo = coincidenciaDiagonal();
         if (simbolo != SimboloType.EMPTY) {
             return simbolo;
         }
-        
+
         return SimboloType.EMPATE;
     }
 
