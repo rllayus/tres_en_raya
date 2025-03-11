@@ -11,4 +11,5 @@ package edu.upb.tresenraya.utils;
 public interface Iterator<T> {
     boolean hasNext();
     T getNext();
+    void reset();
 }

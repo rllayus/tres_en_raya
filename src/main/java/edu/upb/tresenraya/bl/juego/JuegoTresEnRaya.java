@@ -61,6 +61,31 @@ public class JuegoTresEnRaya {
         }
         return SimboloType.EMPTY;
     }
+    
+    public SimboloType marcarExa(SimboloType simbolo, int posicionX, int posicionY) {
+        if (!turno.equals(simbolo)) {
+            System.out.println("No es turno del jugador");
+            return SimboloType.EMPTY;
+        }
+        if (posicionX < 0 && posicionX > 2) {
+            System.out.println("Posicion fuera de lugar");
+            return SimboloType.EMPTY;
+        }
+        if (posicionY < 0 && posicionY > 2) {
+            System.out.println("Posicion fuera de lugar");
+            return SimboloType.EMPTY;
+        }
+
+        if (!tablero[posicionX][posicionY].equals(SimboloType.EMPTY)) {
+            System.out.println("La posición ya está ocupada");
+            return SimboloType.EMPTY;
+        }
+        tablero[posicionX][posicionY] = simbolo;
+        if (finPartida()) {
+            return mostrarGanador();
+        }
+        return SimboloType.EMPTY;
+    }
 
     public SimboloType mostrarTurno() {
         return turno;

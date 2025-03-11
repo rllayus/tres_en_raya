@@ -23,6 +23,7 @@ public class Mediador {
     }
 
     public static void sendMessage(String msg) {
+        lister.reset();
         while (lister.hasNext()) {
             OnMessageListener onMessageLister = lister.getNext();
             java.awt.EventQueue.invokeLater(new Runnable() {
@@ -34,6 +35,7 @@ public class Mediador {
     }
 
     public static void sendMessage(Comando msg) {
+        lister.reset();
         while (lister.hasNext()) {
             OnMessageListener onMessageLister = lister.getNext();
             java.awt.EventQueue.invokeLater(new Runnable() {
@@ -45,6 +47,7 @@ public class Mediador {
     }
 
     public static void onClose() {
+        lister.reset();
         while (lister.hasNext()) {
             OnMessageListener onMessageLister = lister.getNext();
             java.awt.EventQueue.invokeLater(new Runnable() {

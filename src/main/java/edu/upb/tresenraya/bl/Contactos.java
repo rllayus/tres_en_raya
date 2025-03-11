@@ -49,5 +49,19 @@ public class Contactos implements SocketListener {
             sc.send(msg.getBytes());
         }
     }
+        public void send(String ip, Comando msg) {
+        System.out.println("Enviando: " + msg);
+        SocketClient sc = this.contatos.get(ip);
+        if (sc != null) {
+            sc.send(msg.getComando().getBytes());
+        }
+    }
+    
+        public void close(String ip) {
+        SocketClient sc = this.contatos.get(ip);
+        if (sc != null) {
+            sc.detener();
+        }
+    }
 
 }

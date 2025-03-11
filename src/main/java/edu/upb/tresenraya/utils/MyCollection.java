@@ -32,4 +32,9 @@ public class MyCollection<T> implements Iterator<T>{
         index=index +1;
         return obj;
     }   
+
+    @Override
+    public void reset() {
+        this.index=0;
+    }
 }

@@ -7,9 +7,11 @@ package edu.upb.tresenraya.server;
 import edu.upb.tresenraya.bl.AceptarSolicitud;
 import edu.upb.tresenraya.bl.AceptarSolicitudJuego;
 import edu.upb.tresenraya.bl.Comando;
+import edu.upb.tresenraya.bl.Comando10;
 import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.bl.IniciarJuego;
 import edu.upb.tresenraya.bl.MarcarPartida;
+import edu.upb.tresenraya.bl.MarcarPartidaExa;
 import edu.upb.tresenraya.bl.MediadorContactos;
 import edu.upb.tresenraya.bl.NuevaPartida;
 import edu.upb.tresenraya.bl.RechazarSolicitud;
@@ -66,6 +68,7 @@ public class SocketClient extends Thread {
                         c.parsear(message);
                     }
                     if (message.contains("0004")) {
+                        System.out.println("Comando Iniciar Juego");
                         c = new IniciarJuego();
                         c.parsear(message);
                     }
@@ -84,6 +87,16 @@ public class SocketClient extends Thread {
 
                     if (message.contains("0008")) {
                         c = new MarcarPartida();
+                        c.parsear(message);
+                    }
+
+                    if (message.contains("0010")) {
+                        c = new Comando10();
+                        c.parsear(message);
+                    }
+
+                    if (message.contains("0011")) {
+                        c = new MarcarPartidaExa();
                         c.parsear(message);
                     }
 

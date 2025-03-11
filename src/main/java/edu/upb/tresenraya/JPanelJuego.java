@@ -7,6 +7,7 @@ package edu.upb.tresenraya;
 import edu.upb.tresenraya.bl.Comando;
 import edu.upb.tresenraya.bl.Contactos;
 import edu.upb.tresenraya.bl.MarcarPartida;
+import edu.upb.tresenraya.bl.MarcarPartidaExa;
 import edu.upb.tresenraya.bl.juego.JuegoTresEnRaya;
 import edu.upb.tresenraya.bl.juego.SimboloType;
 import edu.upb.tresenraya.mediador.Mediador;
@@ -18,6 +19,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.SwingUtilities;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,11 +29,11 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class JPanelJuego extends javax.swing.JPanel implements MouseListener , OnMessageListener{
+public class JPanelJuego extends javax.swing.JPanel implements MouseListener, OnMessageListener {
+
     private JuegoTresEnRaya juego;
     private final int alturaTurno = 50;
     private String ipJugadorRemoto = null;
-   
 
     /**
      * Creates new form JPanelJuego
@@ -130,8 +132,8 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener , O
 
     private void dibujarTurno(Graphics g) {
         String texto = "Turno: " + this.juego.mostrarTurno().name();
-        if(ipJugadorRemoto == null){
-            texto = "Juego sin iniciar"  ;
+        if (ipJugadorRemoto == null) {
+            texto = "Juego sin iniciar";
         }
 
         g.setColor(Color.LIGHT_GRAY);
@@ -150,6 +152,7 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener , O
 
     @Override
     public void mouseClicked(MouseEvent e) {
+
         int x = e.getX();
         int y = e.getY() - alturaTurno; // Ajuste de coordenada Y
 
@@ -157,9 +160,19 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener , O
             int fila = y / ((getHeight() - alturaTurno) / 3);
             int columna = x / (getWidth() / 3);
             SimboloType simboloType = juego.mostrarTurno();
-            this.juego.marcar(simboloType, fila, columna);
-            Comando comando = new MarcarPartida(simboloType.name(), fila, columna);
-            Contactos.getInstance().send(ipJugadorRemoto, comando.getComando());
+            
+            if (SwingUtilities.isRightMouseButton(e)) {
+                System.out.println("Clic derecho");
+                this.juego.marcarExa(simboloType, fila, columna);
+                Comando comando = new MarcarPartidaExa(simboloType.name(), fila, columna);
+                Contactos.getInstance().send(ipJugadorRemoto, comando.getComando());
+            } else {
+                System.out.println("Clic");
+                this.juego.marcar(simboloType, fila, columna);
+                Comando comando = new MarcarPartida(simboloType.name(), fila, columna);
+                Contactos.getInstance().send(ipJugadorRemoto, comando.getComando());
+            }
+
             verificarGanador();
             verificarEmpate();
             repaint();
@@ -191,31 +204,45 @@ public class JPanelJuego extends javax.swing.JPanel implements MouseListener , O
     public void onMessage(Comando c) {
         if (c.getCodigoComando().equals("0008")) {
             MarcarPartida sol = (MarcarPartida) c;
-            SimboloType simbolo=SimboloType.valueOf(sol.getSimbolo());
+            SimboloType simbolo = SimboloType.valueOf(sol.getSimbolo());
             this.juego.marcar(simbolo, sol.getPosicionX(), sol.getPosicionY());
             verificarGanador();
             verificarEmpate();
             repaint();
             return;
-           
         }
-       
+
+        if (c.getCodigoComando().equals("0011")) {
+            MarcarPartidaExa sol = (MarcarPartidaExa) c;
+            SimboloType simbolo = SimboloType.valueOf(sol.getSimbolo());
+            this.juego.marcarExa(simbolo, sol.getPosicionX(), sol.getPosicionY());
+            verificarGanador();
+            verificarEmpate();
+            repaint();
+            return;
+        }
+
     }
 
     @Override
     public void onClose() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
-    public void iniciarJuego(String ipJugadorRemoto, SimboloType simboloType){
+
+    public void iniciarJuego(String ipJugadorRemoto, SimboloType simboloType) {
         this.ipJugadorRemoto = ipJugadorRemoto;
         this.juego = new JuegoTresEnRaya(simboloType);
         repaint();
         System.out.println("Iniciando juego");
     }
-    public void finalizar(){
+
+    public void finalizar() {
         this.ipJugadorRemoto = null;
         this.juego = new JuegoTresEnRaya();
         repaint();
+    }
+
+    public SimboloType getTurno() {
+        return this.juego.mostrarTurno();
     }
 }
